@@ -66,7 +66,7 @@ ALIASES = {
 
     'timeattack': 'race',
     'lc': 'leastcash',
-    'lt': 'leasttier',
+    'lt': 'leasttiers',
     'leasttier': 'leasttiers',
 
     'bosstier': 'bosstiers',
