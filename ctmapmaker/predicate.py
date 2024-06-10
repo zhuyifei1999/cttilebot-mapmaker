@@ -4,9 +4,78 @@ import yaml
 
 from ctmapmaker.eval import mapmaker_compile
 
-
 with open('/ctmapgen-data/conf/conf.yaml', 'r') as f:
     conf = yaml.safe_load(f)
+
+ALIASES = {
+    'monkeymeadow': 'tutorial',
+
+    # tower
+    'dart': 'dartmonkey',
+    'boomerang': 'boomerangmonkey',
+    'boomer': 'boomerangmonkey',
+    'bomb': 'bombshooter',
+    'tack': 'tackshooter',
+    'ice': 'icemonkey',
+    'glue': 'gluegunner',
+    'sniper': 'snipermonkey',
+    'sub': 'monkeysub',
+    'buccaneer': 'monkeybuccaneer',
+    'boat': 'monkeybuccaneer',
+    'ace': 'monkeyace',
+    'heli': 'helipilot',
+    'mortar': 'mortarmonkey',
+    'dartling': 'dartlinggunner',
+    'wizard': 'wizardmonkey',
+    'super': 'supermonkey',
+    'ninja': 'ninjamonkey',
+    'alch': 'alchemist',
+    # 'druid',
+    'farm': 'bananafarm',
+    'spike': 'spikefactory',
+    'spact': 'spikefactory',
+    'spac': 'spikefactory',
+    'village': 'monkeyvillage',
+    'engineer': 'engineermonkey',
+    'engi': 'engineermonkey',
+    'beast': 'beasthandler',
+
+    # hero
+    # 'quincy',
+    'gwen': 'gwendolin',
+    'striker': 'strikerjones',
+    'jones': 'strikerjones',
+    'obyn': 'obyngreenfoot',
+    'churchill': 'captainchurchill',
+    'ben': 'benjamin',
+    # 'ezili',
+    'pat': 'patfusty',
+    # 'adora',
+    'brickell': 'admiralbrickell',
+    'etn': 'etienne',
+    # 'sauda',
+    # 'psi',
+    'gerry': 'geraldo',
+    # 'corvus',
+    'lia': 'rosalia',
+
+    # misc
+    'start': 'startround',
+    'end': 'endround',
+    'cash': 'startcash',
+
+    'timeattack': 'race',
+    'lc': 'leastcash',
+    'lt': 'leasttier',
+    'leasttier': 'leasttiers',
+
+    'bosstier': 'bosstiers',
+    'reg': 'regular',
+    'blank': 'regular',
+
+    # disamb workaround
+    'relic': 'relictype',
+}
 
 
 class TowerCategory:
@@ -149,6 +218,71 @@ class Hero:
             return self.hero == other.hero
         if isinstance(other, bool):
             return self['enabled'] == other
+        return NotImplemented
+
+
+class HeroSet:
+    def __init__(self, tile, heros):
+        self.tile = tile
+        self.heros = heros
+
+    def __getitem__(self, name):
+        name = name.lower().replace('_', '')
+        name = ALIASES.get(name, name)
+
+        for hero in Hero.validlist():
+            if hero.lower() == name:
+                return Hero(self.tile, hero)
+        raise AttributeError(name)
+
+    @classmethod
+    def of(cls, tile):
+        allheros = set()
+        heros = set()
+
+        for tower in tile['GameData']['dcModel']['towers']['_items']:
+            if tower['tower'] == 'ChosenPrimaryHero':
+                if tower['max']:
+                    heros = allheros
+            elif tower['isHero']:
+                allheros.add(tower['tower'])
+                if tower['max']:
+                    heros.add(tower['tower'])
+
+        return cls(tile, heros)
+
+    def __bool__(self):
+        return bool(self.heros)
+
+    def __eq__(self, other):
+        if isinstance(other, HeroSet):
+            return self.heros == other.heros
+        if isinstance(other, Hero):
+            return self.heros == set((other.hero,))
+        if isinstance(other, bool):
+            return bool(self.heros) == other
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, HeroSet):
+            return self.heros < other.heros
+        return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, HeroSet):
+            return self.heros > other.heros
+        return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, HeroSet):
+            return self.heros < other.heros
+        return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, HeroSet):
+            return self.heros == other.heros
+        if isinstance(other, Hero):
+            return other.hero in self.heros
         return NotImplemented
 
 
@@ -360,75 +494,6 @@ class RelicType:
 
 
 class Context:
-    ALIASES = {
-        'monkeymeadow': 'tutorial',
-
-        # tower
-        'dart': 'dartmonkey',
-        'boomerang': 'boomerangmonkey',
-        'boomer': 'boomerangmonkey',
-        'bomb': 'bombshooter',
-        'tack': 'tackshooter',
-        'ice': 'icemonkey',
-        'glue': 'gluegunner',
-        'sniper': 'snipermonkey',
-        'sub': 'monkeysub',
-        'buccaneer': 'monkeybuccaneer',
-        'boat': 'monkeybuccaneer',
-        'ace': 'monkeyace',
-        'heli': 'helipilot',
-        'mortar': 'mortarmonkey',
-        'dartling': 'dartlinggunner',
-        'wizard': 'wizardmonkey',
-        'super': 'supermonkey',
-        'ninja': 'ninjamonkey',
-        'alch': 'alchemist',
-        # 'druid',
-        'farm': 'bananafarm',
-        'spike': 'spikefactory',
-        'spact': 'spikefactory',
-        'spac': 'spikefactory',
-        'village': 'monkeyvillage',
-        'engineer': 'engineermonkey',
-        'engi': 'engineermonkey',
-        'beast': 'beasthandler',
-
-        # hero
-        # 'quincy',
-        'gwen': 'gwendolin',
-        'striker': 'strikerjones',
-        'jones': 'strikerjones',
-        'obyn': 'obyngreenfoot',
-        'churchill': 'captainchurchill',
-        'ben': 'benjamin',
-        # 'ezili',
-        'pat': 'patfusty',
-        # 'adora',
-        'brickell': 'admiralbrickell',
-        'etn': 'etienne',
-        # 'sauda',
-        # 'psi',
-        'gerry': 'geraldo',
-        # 'corvus',
-        'lia': 'rosalia',
-
-        # misc
-        'start': 'startround',
-        'end': 'endround',
-        'cash': 'startcash',
-
-        'timeattack': 'race',
-        'lc': 'leastcash',
-        'lt': 'leasttier',
-        'leasttier': 'leasttiers',
-
-        'bosstier': 'bosstiers',
-        'reg': 'regular',
-        'blank': 'regular',
-
-        # disamb workaround
-        'relic': 'relictype',
-    }
     CONSTANTS = {
         'true': True,
         'false': False,
@@ -440,8 +505,7 @@ class Context:
 
     def __getitem__(self, name):
         name = name.lower().replace('_', '')
-
-        name = self.ALIASES.get(name, name)
+        name = ALIASES.get(name, name)
         if name in self.CONSTANTS:
             return self.CONSTANTS[name]
 
@@ -459,6 +523,8 @@ class Context:
                 return 0
             return self.tile['GameData']['bossData']['TierCount']
 
+        if name == 'hero':
+            return HeroSet.of(self.tile)
         if name == 'map':
             return Map.of(self.tile)
         if name == 'difficulty':
