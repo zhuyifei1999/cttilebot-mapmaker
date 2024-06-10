@@ -432,7 +432,7 @@ class Context:
     CONSTANTS = {
         'true': True,
         'false': False,
-        'inf': 'inf',
+        'inf': math.inf,
     }
 
     def __init__(self, tile):
@@ -442,6 +442,8 @@ class Context:
         name = name.lower().replace('_', '')
 
         name = self.ALIASES.get(name, name)
+        if name in self.CONSTANTS:
+            return self.CONSTANTS[name]
 
         if name == 'startcash':
             return self.tile['GameData']['dcModel']['startRules']['cash']
