@@ -4,20 +4,20 @@ from ctmapmaker.error import MapmakerError
 
 
 class MapmakerLexer(Lexer):
-    tokens = {NAME, NUMBER, EQ, NE, LT, LE, GT, GE, AND, OR, NOT}
+    tokens = {LE, GE, EQ, NE, LT, GT, AND, OR, NOT, NAME, NUMBER}
     ignore = ' \t'
     literals = {'+', '-', '*', '/', '(', ')', '.'}
 
-    NAME = r'[a-zA-Z][a-zA-Z0-9]*'
-    EQ = r'==?'
-    NE = r'<>|!=|~='
-    LT = r'<'
     LE = r'<='
-    GT = r'>'
     GE = r'>='
+    EQ = r'==?'
+    NE = r'!=|~=|<>'
+    LT = r'<'
+    GT = r'>'
     AND = r'&&?|and|AND'
     OR = r'\|\|?|or|OR'
     NOT = r'!|~|not|NOT'
+    NAME = r'[a-zA-Z][a-zA-Z0-9]*'
 
     @_(r'\d+')
     def NUMBER(self, t):
@@ -34,8 +34,8 @@ class MapmakerParser(Parser):
     precedence = (
         ('left', 'OR'),
         ('left', 'AND'),
-        ('left', 'EQ', 'NE'),
-        ('left', 'LT', 'LE', 'GT', 'GE'),
+        ('left', 'CMP_RESOLVE'),
+        ('left', 'LE', 'GE', 'LT', 'GT', 'EQ', 'NE'),
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS', 'NOT'),
@@ -62,29 +62,43 @@ class MapmakerParser(Parser):
     def expr(self, p):
         return ('op_uminus', p.expr)
 
-    @_('expr EQ expr')
-    def expr(self, p):
-        return ('op_eq', p.expr0, p.expr1)
+    @staticmethod
+    def _cmp_to_op(cmp):
+        return {
+            '<=': 'LE',
+            '>=': 'GE',
+            '==': 'EQ',
+            '=': 'EQ',
+            '!=': 'NE',
+            '~=': 'NE',
+            '<>': 'NE',
+            '<': 'LT',
+            '>': 'GT',
+        }[cmp]
 
-    @_('expr NE expr')
-    def expr(self, p):
-        return ('op_ne', p.expr0, p.expr1)
+    @_('expr LE expr',
+       'expr GE expr',
+       'expr EQ expr',
+       'expr NE expr',
+       'expr LT expr',
+       'expr GT expr')
+    def cmp(self, p):
+        return [self._cmp_to_op(p[1])], [p.expr0, p.expr1]
 
-    @_('expr LT expr')
-    def expr(self, p):
-        return ('op_lt', p.expr0, p.expr1)
+    @_('cmp LE expr',
+       'cmp GE expr',
+       'cmp EQ expr',
+       'cmp NE expr',
+       'cmp LT expr',
+       'cmp GT expr')
+    def cmp(self, p):
+        p.cmp[0].append(self._cmp_to_op(p[1]))
+        p.cmp[1].append(p.expr)
+        return p.cmp
 
-    @_('expr LE expr')
+    @_('cmp %prec CMP_RESOLVE')
     def expr(self, p):
-        return ('op_le', p.expr0, p.expr1)
-
-    @_('expr GT expr')
-    def expr(self, p):
-        return ('op_gt', p.expr0, p.expr1)
-
-    @_('expr GE expr')
-    def expr(self, p):
-        return ('op_ge', p.expr0, p.expr1)
+        return ('op_cmp', p.cmp[0], *p.cmp[1])
 
     @_('expr AND expr')
     def expr(self, p):
@@ -172,35 +186,27 @@ class MapmakerEval():
         x = stack.pop()
         stack.append(x[name])
 
-    def op_eq(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x == y)
+    def op_cmp(self, ctx, stack, ops):
+        vals = [stack.pop() for i in range(len(ops) + 1)][::-1]
+        result = True
+        for i, op in enumerate(ops):
+            x, y = vals[i], vals[i+1]
+            if op == 'LE':
+                result = result and x <= y
+            elif op == 'GE':
+                result = result and x >= y
+            elif op == 'EQ':
+                result = result and x == y
+            elif op == 'NE':
+                result = result and x != y
+            elif op == 'LT':
+                result = result and x < y
+            elif op == 'GT':
+                result = result and x > y
+            else:
+                assert False
 
-    def op_ne(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x != y)
-
-    def op_lt(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x < y)
-
-    def op_le(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x <= y)
-
-    def op_gt(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x > y)
-
-    def op_ge(self, ctx, stack):
-        y = stack.pop()
-        x = stack.pop()
-        stack.append(x >= y)
+        stack.append(result)
 
     def op_and(self, ctx, stack):
         y = stack.pop()
