@@ -10,7 +10,7 @@ class MapmakerLexer(Lexer):
 
     NAME = r'[a-zA-Z][a-zA-Z0-9]*'
     EQ = r'==?'
-    NE = r'<>|~=|~='
+    NE = r'<>|!=|~='
     LT = r'<'
     LE = r'<='
     GT = r'>'
