@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from aggdraw import Draw, Brush, Pen
 
 from ctmapmaker.coords import TILECOORDS, MYRIN_CODEMAP
+from ctmapmaker.predicate import make_predicate
 
 ASSETS = os.path.join(os.path.dirname(__file__), 'assets')
 HEXSIZE = 32
@@ -87,7 +88,7 @@ def loadtiles(season):
 
 def render(season, predicate_str, teamid):
     tiles = loadtiles(season)
-    predicate = lambda x: True
+    predicate = make_predicate(predicate_str)
 
     # TODO: support mapsize 8 in CT 24
     if 'AAA' in tiles:
@@ -145,6 +146,7 @@ def render(season, predicate_str, teamid):
         center, vertices = hexagon_generator(row, col)
         draw.polygon(vertices, Pen('white', 2), Brush(fillcolor))
 
+    num_selected = 0
     for tilecode, tiledata in tiles.items():
         row, col = tilecoord2gencoord(TILECOORDS[tilecode], teamid)
 
@@ -159,6 +161,7 @@ def render(season, predicate_str, teamid):
             paste_icon(icon, center)
         if selected:
             labels.append((center, tilecode))
+            num_selected += 1
 
     draw.flush()
 
@@ -180,6 +183,17 @@ def render(season, predicate_str, teamid):
             draw.text((cx-1, cy+1), label, fill='black', anchor='mm', font=font)
             draw.text((cx-1, cy-1), label, fill='black', anchor='mm', font=font)
             draw.text((cx, cy), label, fill='white', anchor='mm', font=font)
+
+    if num_selected:
+        cx, cy = 15, imageh - 15
+        label = str(num_selected)
+        font = ImageFont.truetype(
+            os.path.join(ASSETS, 'LuckiestGuy-Regular.ttf'), 28)
+        draw.text((cx+1, cy+1), label, fill='black', anchor='lb', font=font)
+        draw.text((cx+1, cy-1), label, fill='black', anchor='lb', font=font)
+        draw.text((cx-1, cy+1), label, fill='black', anchor='lb', font=font)
+        draw.text((cx-1, cy-1), label, fill='black', anchor='lb', font=font)
+        draw.text((cx, cy), label, fill='white', anchor='lb', font=font)
 
     return image.convert('RGB')
 
