@@ -408,9 +408,9 @@ class Context:
         'etn': 'etienne',
         # 'sauda',
         # 'psi',
-        # 'geraldo',
+        'gerry': 'geraldo',
         # 'corvus',
-        # 'rosalia',
+        'lia': 'rosalia',
 
         # misc
         'start': 'startround',
