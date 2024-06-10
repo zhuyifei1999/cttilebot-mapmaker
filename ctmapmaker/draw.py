@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from aggdraw import Draw, Brush, Pen
 
 from ctmapmaker.coords import TILECOORDS, MYRIN_CODEMAP
+from ctmapmaker.error import MapmakerError
 from ctmapmaker.predicate import make_predicate
 
 ASSETS = os.path.join(os.path.dirname(__file__), 'assets')
@@ -76,7 +77,12 @@ def loadtiles(season):
     tilespath = f'/ctmap/{season}/tiles'
     tiles = {}
 
-    for filename in os.listdir(tilespath):
+    try:
+        files = os.listdir(tilespath)
+    except FileNotFoundError:
+        raise MapmakerError("I don't have the challenge data for that event!")
+
+    for filename in files:
         if filename.endswith('.json'):
             tilecode = filename[:-len('.json')]
             tilecode = MYRIN_CODEMAP.get(tilecode, tilecode)
@@ -90,7 +96,6 @@ def render(season, predicate_str, teamid):
     tiles = loadtiles(season)
     predicate = make_predicate(predicate_str)
 
-    # TODO: support mapsize 8 in CT 24
     if 'AAA' in tiles:
         mapsize, outercode = 8, 'Z'
     elif 'AAB' in tiles:
