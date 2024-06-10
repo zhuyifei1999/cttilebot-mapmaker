@@ -6,7 +6,6 @@ from ctmapmaker.eval import mapmaker_compile
 
 with open('/ctmapgen-data/conf/conf.yaml', 'r') as f:
     conf = yaml.safe_load(f)
-
 ALIASES = {
     'monkeymeadow': 'tutorial',
 
@@ -21,12 +20,14 @@ ALIASES = {
     'sniper': 'snipermonkey',
     'sub': 'monkeysub',
     'buccaneer': 'monkeybuccaneer',
+    'bucc': 'monkeybuccaneer',
     'boat': 'monkeybuccaneer',
     'ace': 'monkeyace',
     'heli': 'helipilot',
     'mortar': 'mortarmonkey',
     'dartling': 'dartlinggunner',
     'wizard': 'wizardmonkey',
+    'wiz': 'wizardmonkey',
     'super': 'supermonkey',
     'ninja': 'ninjamonkey',
     'alch': 'alchemist',
@@ -39,6 +40,7 @@ ALIASES = {
     'engineer': 'engineermonkey',
     'engi': 'engineermonkey',
     'beast': 'beasthandler',
+    'bh': 'beasthandler',
 
     # hero
     # 'quincy',
@@ -47,11 +49,14 @@ ALIASES = {
     'jones': 'strikerjones',
     'obyn': 'obyngreenfoot',
     'churchill': 'captainchurchill',
+    'church': 'captainchurchill',
     'ben': 'benjamin',
     # 'ezili',
     'pat': 'patfusty',
     # 'adora',
     'brickell': 'admiralbrickell',
+    'brick': 'admiralbrickell',
+    'eti': 'etienne',
     'etn': 'etienne',
     # 'sauda',
     # 'psi',
@@ -70,6 +75,7 @@ ALIASES = {
     'leasttier': 'leasttiers',
 
     'bosstier': 'bosstiers',
+    'tiers': 'bosstiers',
     'reg': 'regular',
     'blank': 'regular',
 
