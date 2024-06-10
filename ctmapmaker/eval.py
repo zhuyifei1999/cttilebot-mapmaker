@@ -125,8 +125,16 @@ class MapmakerParser(Parser):
         return ('op_const', p.NUMBER)
 
     @_('NAME')
+    def name(self, p):
+        return p.NAME
+
+    @_('name NAME')
+    def name(self, p):
+        return p.name + p.NAME
+
+    @_('name')
     def expr(self, p):
-        return ('op_getname', p.NAME)
+        return ('op_getname', p.name)
 
     def error(self, token):
         if token:
