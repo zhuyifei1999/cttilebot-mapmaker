@@ -74,20 +74,18 @@ def tileicon(tiledata):
 
 
 def loadtiles(season):
-    tilespath = f'/ctmap/{season}/tiles'
-    tiles = {}
-
     try:
-        files = os.listdir(tilespath)
+        f = open(f'/ctmap/{season}/tiles.json')
     except FileNotFoundError:
         raise MapmakerError("I don't have the challenge data for that event!")
 
-    for filename in files:
-        if filename.endswith('.json'):
-            tilecode = filename[:-len('.json')]
-            tilecode = MYRIN_CODEMAP.get(tilecode, tilecode)
-            with open(os.path.join(tilespath, filename)) as f:
-                tiles[tilecode] = json.load(f)
+    with f:
+        tiles_raw = json.load(f)
+
+    tiles = {}
+    for tilecode, tiledata in tiles_raw.items():
+        tilecode = MYRIN_CODEMAP.get(tilecode, tilecode)
+        tiles[tilecode] = tiledata
 
     return tiles
 

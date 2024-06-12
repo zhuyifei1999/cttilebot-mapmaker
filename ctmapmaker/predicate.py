@@ -6,6 +6,7 @@ from ctmapmaker.eval import mapmaker_compile
 
 with open('/ctmapgen-data/conf/conf.yaml', 'r') as f:
     conf = yaml.safe_load(f)
+
 ALIASES = {
     'monkeymeadow': 'tutorial',
 
