@@ -523,7 +523,7 @@ class Context:
         if name == 'endround':
             end = self.tile['GameData']['dcModel']['startRules']['endRound']
             if end == -1:
-                return math.inf
+                return math.nan
             return end
         if name == 'bosstiers':
             if 'bossData' not in self.tile['GameData']:
