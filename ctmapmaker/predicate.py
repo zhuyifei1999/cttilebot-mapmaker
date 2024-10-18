@@ -273,16 +273,22 @@ class HeroSet:
     def __lt__(self, other):
         if isinstance(other, HeroSet):
             return self.heros < other.heros
+        if isinstance(other, Hero):
+            return other.hero not in self.heros
         return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, HeroSet):
             return self.heros > other.heros
+        if isinstance(other, Hero):
+            return other.hero in self.heros and len(self.heros) > 1
         return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, HeroSet):
             return self.heros < other.heros
+        if isinstance(other, Hero):
+            return other.hero not in self.heros or len(self.heros) <= 1
         return NotImplemented
 
     def __ge__(self, other):
