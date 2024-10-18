@@ -588,6 +588,12 @@ class TileCode:
         return self.code == self.tile['Code']
 
 
+CONSTANTS = {
+    'true': True,
+    'false': False,
+    'inf': math.inf,
+}
+
 TYPES = [
     TowerCategory,
     Tower,
@@ -601,7 +607,21 @@ TYPES = [
     RelicType,
     TileCode,
 ]
-ALL_VALIDLIST = [*ALIASES]
+ALL_VALIDLIST = [
+    *ALIASES,
+    *CONSTANTS,
+    'startcash',
+    'startround',
+    'endround',
+    'bosstiers',
+    'hero',
+    'map',
+    'difficulty',
+    'gametype',
+    'boss',
+    'tiletype',
+    'relictype',
+]
 
 for cls in TYPES:
     if cls == TileCode:
@@ -613,20 +633,14 @@ for cls in TYPES:
 
 
 class Context:
-    CONSTANTS = {
-        'true': True,
-        'false': False,
-        'inf': math.inf,
-    }
-
     def __init__(self, tile):
         self.tile = tile
 
     def __getitem__(self, name):
         name = name.lower().replace('_', '')
         name = ALIASES.get(name, name)
-        if name in self.CONSTANTS:
-            return self.CONSTANTS[name]
+        if name in CONSTANTS:
+            return CONSTANTS[name]
 
         if name == 'startcash':
             return self.tile['GameData']['dcModel']['startRules']['cash']
