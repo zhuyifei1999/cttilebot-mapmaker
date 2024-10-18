@@ -2,6 +2,7 @@ import functools
 import math
 import yaml
 
+from ctmapmaker.coords import TILECOORDS
 from ctmapmaker.eval import mapmaker_compile
 
 with open('/ctmapgen-data/conf/conf.yaml', 'r') as f:
@@ -130,6 +131,8 @@ ALIASES = {
     'tiers': 'bosstiers',
     'reg': 'regular',
     'blank': 'regular',
+
+    'code': 'tilecode',
 
     # disamb workaround
     'relic': 'relictype',
@@ -562,6 +565,28 @@ class RelicType:
         return self.relictype == self.tile['RelicType']
 
 
+class TileCode:
+    @classmethod
+    def validlist(cls):
+        return list(TILECOORDS)
+
+    @classmethod
+    def of(cls, tile):
+        return cls(tile, tile['Code'])
+
+    def __init__(self, tile, code):
+        self.tile = tile
+        self.code = code
+
+    def __eq__(self, other):
+        if isinstance(other, TileCode):
+            return self.code == other.code
+        return NotImplemented
+
+    def __bool__(self):
+        return self.code == self.tile['Code']
+
+
 class Context:
     CONSTANTS = {
         'true': True,
@@ -606,6 +631,8 @@ class Context:
             return TileType.of(self.tile)
         if name == 'relictype':
             return RelicType.of(self.tile)
+        if name == 'tilecode':
+            return TileCode.of(self.tile)
 
         for cls in [
             TowerCategory,
@@ -618,6 +645,7 @@ class Context:
             Boss,
             TileType,
             RelicType,
+            TileCode,
         ]:
             for entry in cls.validlist():
                 if name == entry.lower():

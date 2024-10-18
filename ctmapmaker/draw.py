@@ -86,6 +86,7 @@ def loadtiles(season):
     for tilecode, tiledata in tiles_raw.items():
         tilecode = MYRIN_CODEMAP.get(tilecode, tilecode)
         tiles[tilecode] = tiledata
+        tiledata['Code'] = tilecode
 
     return tiles
 
