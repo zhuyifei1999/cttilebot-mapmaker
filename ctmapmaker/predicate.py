@@ -298,6 +298,11 @@ class HeroSet:
             return other.hero in self.heros
         return NotImplemented
 
+    def contains(self, item):
+        if isinstance(item, Hero):
+            return item.hero in self.heros
+        return False
+
 
 @functools.total_ordering
 class MapDifficulty:

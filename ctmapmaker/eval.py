@@ -4,7 +4,7 @@ from ctmapmaker.error import MapmakerError
 
 
 class MapmakerLexer(Lexer):
-    tokens = {LE, GE, EQ, NE, LT, GT, AND, OR, NOT, NAME, NUMBER}
+    tokens = {LE, GE, EQ, NE, LT, GT, IN, NI, AND, OR, NOT, NAME, NUMBER}
     ignore = ' \t'
     literals = {'+', '-', '*', '/', '(', ')', '.'}
 
@@ -14,6 +14,13 @@ class MapmakerLexer(Lexer):
     NE = r'!=|~=|<>'
     LT = r'<'
     GT = r'>'
+    IN = 'in|IN'
+
+    @_(r'not[ \t]*in|NOT[ \t]*IN')
+    def NI(self, t):
+        t.value = 'NI'
+        return t
+
     AND = r'&&?|and|AND'
     OR = r'\|\|?|or|OR'
     NOT = r'!|~|not|NOT'
@@ -35,7 +42,7 @@ class MapmakerParser(Parser):
         ('left', 'OR'),
         ('left', 'AND'),
         ('left', 'CMP_RESOLVE'),
-        ('left', 'LE', 'GE', 'LT', 'GT', 'EQ', 'NE'),
+        ('left', 'LE', 'GE', 'LT', 'GT', 'EQ', 'NE', 'IN', 'NI'),
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS', 'NOT'),
@@ -74,6 +81,9 @@ class MapmakerParser(Parser):
             '<>': 'NE',
             '<': 'LT',
             '>': 'GT',
+            'in': 'IN',
+            'IN': 'IN',
+            'NI': 'NI',
         }[cmp]
 
     @_('expr LE expr',
@@ -81,7 +91,9 @@ class MapmakerParser(Parser):
        'expr EQ expr',
        'expr NE expr',
        'expr LT expr',
-       'expr GT expr')
+       'expr GT expr',
+       'expr IN expr',
+       'expr NI expr')
     def cmp(self, p):
         return [self._cmp_to_op(p[1])], [p.expr0, p.expr1]
 
@@ -90,7 +102,9 @@ class MapmakerParser(Parser):
        'cmp EQ expr',
        'cmp NE expr',
        'cmp LT expr',
-       'cmp GT expr')
+       'cmp GT expr',
+       'cmp IN expr',
+       'cmp NI expr')
     def cmp(self, p):
         p.cmp[0].append(self._cmp_to_op(p[1]))
         p.cmp[1].append(p.expr)
@@ -211,6 +225,18 @@ class MapmakerEval():
                 result = result and x < y
             elif op == 'GT':
                 result = result and x > y
+            elif op == 'IN':
+                # We don't want the default __contains__
+                # which calls __getitem__
+                if hasattr(y, 'contains'):
+                    result = result and y.contains(x)
+                else:
+                    result = False
+            elif op == 'NI':
+                if hasattr(y, 'contains'):
+                    result = result and not y.contains(x)
+                else:
+                    result = False
             else:
                 assert False
 
