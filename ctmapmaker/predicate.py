@@ -674,9 +674,12 @@ def make_predicate(predicate_str):
     if not predicate_str.strip():
         return lambda _: False
 
+    # Special case for a comma-separated list of tiles
+    if ',' in predicate_str:
+        tiles = predicate_str.replace(' ', '').split(',')
+        if all(code.upper() in TILECOORDS for code in tiles):
+            return lambda tile: any(
+                code.upper() == tile['Code'] for code in tiles)
+
     func = mapmaker_compile(predicate_str)
-
-    def apply(tile):
-        return func(Context(tile))
-
-    return apply
+    return lambda tile: func(Context(tile))
