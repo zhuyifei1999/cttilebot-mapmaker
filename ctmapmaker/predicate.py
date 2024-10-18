@@ -1,3 +1,4 @@
+import difflib
 import functools
 import math
 import yaml
@@ -587,6 +588,30 @@ class TileCode:
         return self.code == self.tile['Code']
 
 
+TYPES = [
+    TowerCategory,
+    Tower,
+    Hero,
+    MapDifficulty,
+    Map,
+    Difficulty,
+    GameType,
+    Boss,
+    TileType,
+    RelicType,
+    TileCode,
+]
+ALL_VALIDLIST = [*ALIASES]
+
+for cls in TYPES:
+    if cls == TileCode:
+        # too many matches, no point in suggesting
+        continue
+
+    for entry in cls.validlist():
+        ALL_VALIDLIST.append(entry.lower())
+
+
 class Context:
     CONSTANTS = {
         'true': True,
@@ -634,23 +659,14 @@ class Context:
         if name == 'tilecode':
             return TileCode.of(self.tile)
 
-        for cls in [
-            TowerCategory,
-            Tower,
-            Hero,
-            MapDifficulty,
-            Map,
-            Difficulty,
-            GameType,
-            Boss,
-            TileType,
-            RelicType,
-            TileCode,
-        ]:
+        for cls in TYPES:
             for entry in cls.validlist():
                 if name == entry.lower():
                     return cls(self.tile, entry)
 
+        closest = difflib.get_close_matches(name, ALL_VALIDLIST)
+        if closest:
+            raise NameError(f'{name}. Did you mean: {", ".join(closest)}')
         raise NameError(name)
 
 
