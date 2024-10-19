@@ -610,6 +610,8 @@ TYPES = [
 ALL_VALIDLIST = [
     *ALIASES,
     *CONSTANTS,
+    'lclt',
+    'ltlc',
     'startcash',
     'startround',
     'endround',
@@ -642,7 +644,7 @@ class Context:
         if name in CONSTANTS:
             return CONSTANTS[name]
 
-        if name == 'lclt':
+        if name == 'lclt' or name == 'ltlc':
             return (GameType(self.tile, 'LeastCash') or
                     GameType(self.tile, 'LeastTiers'))
 
