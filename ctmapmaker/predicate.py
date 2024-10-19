@@ -642,6 +642,10 @@ class Context:
         if name in CONSTANTS:
             return CONSTANTS[name]
 
+        if name == 'lclt':
+            return (GameType(self.tile, 'LeastCash') or
+                    GameType(self.tile, 'LeastTiers'))
+
         if name == 'startcash':
             return self.tile['GameData']['dcModel']['startRules']['cash']
         if name == 'startround':
