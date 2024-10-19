@@ -616,6 +616,8 @@ ALL_VALIDLIST = [
     'startround',
     'endround',
     'bosstiers',
+    'towerlimit',
+    'maxtowers',
     'hero',
     'map',
     'difficulty',
@@ -661,6 +663,11 @@ class Context:
             if 'bossData' not in self.tile['GameData']:
                 return 0
             return self.tile['GameData']['bossData']['TierCount']
+        if name == 'towerlimit' or name == 'maxtowers':
+            limit = self.tile['GameData']['dcModel']['maxTowers']
+            if limit == -1:
+                return math.inf
+            return limit
 
         if name == 'hero':
             return HeroSet.of(self.tile)
