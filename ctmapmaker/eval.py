@@ -152,7 +152,7 @@ class MapmakerParser(Parser):
 
     def error(self, token):
         if token:
-            raise MapmakerError(f'Syntax error at token {token.type}')
+            raise MapmakerError(f'Syntax error at token {token.type}: {token.value}')
         else:
             raise MapmakerError('Parse error in input. EOF')
 
