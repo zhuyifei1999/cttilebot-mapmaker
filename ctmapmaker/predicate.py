@@ -118,6 +118,9 @@ ALIASES = {
     'dheat': 'deepheat',
     'bbs': 'biggerbloonsabotage',
 
+    'blast': 'blastapopoulos',
+    'blasta': 'blastapopoulos',
+
     # misc
     'start': 'startround',
     'end': 'endround',
@@ -484,7 +487,8 @@ class GameType:
 class Boss:
     @classmethod
     def validlist(cls):
-        return ['Bloonarius', 'Lych', 'Vortex', 'Dreadbloon', 'Phayze']
+        return ['Bloonarius', 'Lych', 'Vortex', 'Dreadbloon', 'Phayze',
+                'Blastapopoulos']
 
     @classmethod
     def of(cls, tile):
