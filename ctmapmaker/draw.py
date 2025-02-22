@@ -154,6 +154,7 @@ def render(season, predicate_str, teamid):
     for tilecode, tiledata in tiles.items():
         row, col = tilecoord2gencoord(TILECOORDS[tilecode], teamid)
 
+        tiledata['MapSize'] = mapsize
         selected = predicate(tiledata)
         fillcolor = 'grey' if selected else 'black'
         icon = tileicon(tiledata)

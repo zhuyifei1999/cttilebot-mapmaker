@@ -592,6 +592,30 @@ class TileCode:
         return self.code == self.tile['Code']
 
 
+def spawn_of(tile):
+    mapsize = tile['MapSize']
+
+    spawns = [
+        (0, -2*mapsize),
+        (mapsize, -mapsize),
+        (mapsize, mapsize),
+        (0, 2*mapsize),
+        (-mapsize, mapsize),
+        (-mapsize, -mapsize),
+    ]
+
+    coord = TILECOORDS[tile['Code']]
+
+    def distance(target):
+        absx, absy = abs(coord[0] - target[0]), abs(coord[1] - target[1])
+        if absx > absy:
+            return absx
+        return (absx + absy) // 2
+
+    min_to_spawn = min(distance(spawn) for spawn in spawns)
+    return min_to_spawn == 1
+
+
 CONSTANTS = {
     'true': True,
     'false': False,
@@ -629,6 +653,7 @@ ALL_VALIDLIST = [
     'boss',
     'tiletype',
     'relictype',
+    'spawn',
 ]
 
 for cls in TYPES:
@@ -689,6 +714,8 @@ class Context:
             return RelicType.of(self.tile)
         if name == 'tilecode':
             return TileCode.of(self.tile)
+        if name == 'spawn':
+            return spawn_of(self.tile)
 
         for cls in TYPES:
             for entry in cls.validlist():
