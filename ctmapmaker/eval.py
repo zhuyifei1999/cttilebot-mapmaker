@@ -14,16 +14,16 @@ class MapmakerLexer(Lexer):
     NE = r'!=|~=|<>'
     LT = r'<'
     GT = r'>'
-    IN = 'in|IN'
+    IN = r'\bin\b|\bIN\b'
 
-    @_(r'not[ \t]*in|NOT[ \t]*IN')
+    @_(r'\bnot[ \t]*in\b|\bNOT[ \t]*IN\b')
     def NI(self, t):
         t.value = 'NI'
         return t
 
-    AND = r'&&?|and|AND'
-    OR = r'\|\|?|or|OR'
-    NOT = r'!|~|not|NOT'
+    AND = r'&&?|\band\b|\bAND\b'
+    OR = r'\|\|?|\bor\b|\bOR\b'
+    NOT = r'!|~|\bnot\b|\bNOT\b'
     NAME = r'[a-zA-Z][a-zA-Z0-9]*'
 
     @_(r'\d+')
