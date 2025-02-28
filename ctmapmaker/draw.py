@@ -120,6 +120,7 @@ def render(season, predicate_str, teamid):
     hexagon_generator = HexagonGenerator(HEXSIZE, offx, offy)
     icons = []
     labels = []
+    selected_tiles = []
 
     def paste_icon(icon, center, size=36):
         icon = Image.open(os.path.join(ASSETS, icon))
@@ -166,6 +167,7 @@ def render(season, predicate_str, teamid):
             paste_icon(icon, center)
         if selected:
             labels.append((center, tilecode))
+            selected_tiles.append(tilecode)
             num_selected += 1
 
     draw.flush()
@@ -200,7 +202,7 @@ def render(season, predicate_str, teamid):
         draw.text((cx-1, cy-1), label, fill='black', anchor='lb', font=font)
         draw.text((cx, cy), label, fill='white', anchor='lb', font=font)
 
-    return image.convert('RGB')
+    return image.convert('RGB'), selected_tiles
 
 
 def main():
@@ -209,7 +211,7 @@ def main():
     teamid = int(sys.argv[3])
     output = sys.argv[4]
 
-    image = render(season, predicate_str, teamid)
+    image, _ = render(season, predicate_str, teamid)
     image.save(output)
 
 
