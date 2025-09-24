@@ -170,6 +170,25 @@ def render(season, predicate_str, teamid):
             selected_tiles.append(tilecode)
             num_selected += 1
 
+    if not num_selected:
+        with open(f'/ctmap/{season}/event_relics.json') as f:
+            event_relics = json.load(f)
+        with open(f'/ctmap/{season}/daily_powers.json') as f:
+            daily_powers = json.load(f)
+
+        centery = imageh - 30
+        centerx = imagew - 30
+
+        for relic in daily_powers[::-1]:
+            paste_icon(f'{relic}.png', (centerx, centery))
+            centerx -= 40
+
+        centery -= 48
+        centerx = imagew - 30
+        for relic in event_relics[::-1]:
+            paste_icon(f'{relic}.png', (centerx, centery))
+            centerx -= 40
+
     draw.flush()
 
     for offset, icon in icons:
