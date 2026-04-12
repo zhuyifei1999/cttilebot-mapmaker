@@ -488,7 +488,7 @@ class Boss:
     @classmethod
     def validlist(cls):
         return ['Bloonarius', 'Lych', 'Vortex', 'Dreadbloon', 'Phayze',
-                'Blastapopoulos']
+                'Blastapopoulos', 'Diamondback']
 
     @classmethod
     def of(cls, tile):
