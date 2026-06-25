@@ -66,6 +66,7 @@ ALIASES = {
     'gerry': 'geraldo',
     # 'corvus',
     'lia': 'rosalia',
+    'dan': 'dandmonke',
 
     # relic aliases from pandebot
     # TODO: disamb between towertype and relictype
@@ -73,7 +74,6 @@ ALIASES = {
     'ans': 'airandsea',
     'alchtouch': 'alchemisttouch',
     # 'alch': 'alchemisttouch',
-    'alchtouch': 'alchemisttouch',
     'boost': 'monkeyboost',
     'mboost': 'monkeyboost',
     'mb': 'monkeyboost',
