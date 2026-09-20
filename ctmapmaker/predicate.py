@@ -66,6 +66,7 @@ ALIASES = {
     'gerry': 'geraldo',
     # 'corvus',
     'lia': 'rosalia',
+    'rosa': 'rosalia',
     'dan': 'dandmonke',
 
     # relic aliases from pandebot
