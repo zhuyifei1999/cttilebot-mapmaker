@@ -646,6 +646,7 @@ ALL_VALIDLIST = [
     'bosstiers',
     'towerlimit',
     'maxtowers',
+    'water',
     'hero',
     'map',
     'difficulty',
@@ -697,6 +698,11 @@ class Context:
             if limit == -1:
                 return math.inf
             return limit
+        if name == 'water':
+            for map in conf['maps']:
+                if map['id'] == self.tile['GameData']['selectedMap']:
+                    return map['hasWater']
+            assert False
 
         if name == 'hero':
             return HeroSet.of(self.tile)
